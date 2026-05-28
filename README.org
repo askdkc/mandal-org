@@ -1,0 +1,164 @@
+#+TITLE: org-mandala.el
+
+=org-mandala.el= shows one Org file as a hierarchical 3x3 mandala memo.
+The data remains ordinary Org headings in one =.org= file. The mandala
+buffer is a read-only SVG view for selecting cells and moving through the
+hierarchy; editing happens in the normal full Org buffer.
+
+* Install
+
+Put this repository on =load-path= and load the package:
+
+#+begin_src elisp
+(add-to-list 'load-path "/path/to/mandal-org")
+(require 'org-mandala)
+#+end_src
+
+=mandal-org.el= is also provided as a small compatibility loader.
+=mandalorg.el= remains as a backward-compatibility shim.
+
+The Org buffer command is bound after Org loads:
+
+#+begin_src elisp
+C-c C-v m  org-mandala-view
+#+end_src
+
+* Quick Start
+
+Run:
+
+#+begin_src elisp
+M-x org-mandala-new
+#+end_src
+
+Or open the bundled tutorial sample directly:
+
+#+begin_src elisp
+M-x org-mandala-tutorial
+#+end_src
+
+Choose a new =.org= file and enter the central theme. The package writes
+only the minimal Org data: title metadata plus one top-level heading with
+an =ID=. The eight empty surrounding cells are not created until you edit
+one of them.
+
+To open an existing Org mandala file, visit the file in =org-mode= and run:
+
+#+begin_src elisp
+M-x org-mandala-view
+#+end_src
+
+If point is before the first heading, the first heading is used as the
+center. Otherwise the heading at point is used, unless you are returning
+from an edit session started in the mandala view.
+
+* Keys
+
+| Key        | Action                                          |
+|------------+-------------------------------------------------|
+| =h=        | select west cell                                |
+| =j=        | select south cell                               |
+| =k=        | select north cell                               |
+| =l=        | select east cell                                |
+| =y=        | select northwest cell                           |
+| =u=        | select northeast cell                           |
+| =b=        | select southwest cell                           |
+| =n=        | select southeast cell                           |
+| =c=, =.=   | move selection back to the center cell          |
+| =e=        | edit selected cell in the normal Org buffer     |
+| =RET=      | enter selected existing cell as the next center |
+| =DEL=, =^= | go to the parent mandala                        |
+| =g=        | redraw from the current Org buffer contents     |
+| =q=        | quit the view and return to the Org buffer      |
+
+After editing, save with normal Org/Emacs commands such as =C-x C-s=.
+Run =M-x org-mandala-view= or =C-c C-v m= in the Org buffer to return to
+the same mandala level that was visible before editing.
+
+* Data Model
+
+Each real mandala cell is one Org heading. The current center is a heading,
+and its direct children are the eight possible surrounding cells.
+
+Surrounding cells use =MANDALA_POS= on the child heading:
+
+#+begin_src org
+** マンダラは人間の基本機能
+:PROPERTIES:
+:ID:          basic-function
+:MANDALA_POS: s
+:END:
+#+end_src
+
+Valid positions are:
+
+#+begin_example
+nw n ne w e sw s se
+#+end_example
+
+The display position does not depend on heading order. Duplicate
+=MANDALA_POS= values under the same parent, or invalid position values,
+raise a =user-error= instead of producing an ambiguous view.
+
+When editing an empty cell, a new child heading is created at the correct
+level with =ID= and =MANDALA_POS=. If you cancel editing and leave the
+title empty, the MVP keeps it as an existing untitled cell.
+
+* Preview Rules
+
+The SVG cell preview includes the heading title and the beginning of the
+heading's direct body. It excludes property drawers, other drawers,
+source/example block contents, and child heading contents. Width and line
+count are controlled by:
+
+In the SVG view, heading titles are rendered with a heavier weight and
+body preview lines are rendered slightly smaller. If body text was
+accidentally inserted before the property drawer, =org-mandala= still
+detects the cell's =MANDALA_POS= so reopening the same cell does not
+create another node at the same position. Duplicate positions that already
+exist under the same parent must still be fixed in the Org file.
+
+#+begin_src elisp
+org-mandala-cell-preview-lines
+org-mandala-cell-preview-width
+org-mandala-svg-width
+org-mandala-svg-height
+org-mandala-fit-window
+org-mandala-auto-refresh-on-window-size-change
+org-mandala-window-size-change-delay
+#+end_src
+
+By default the SVG uses the fixed =org-mandala-svg-width= and
+=org-mandala-svg-height= values. The default fixed size is intentionally
+modest to avoid expensive SVG redisplay during frame resizing. Set
+=org-mandala-fit-window= to non-nil to fit the SVG to the visible Emacs
+window when the view is drawn, then press =g= in the mandala view to
+redraw manually after resizing. Automatic redraw after window size
+changes is disabled, even if =org-mandala-auto-refresh-on-window-size-change=
+is set, because repeated SVG rasterization during frame resizing can make
+some Emacs builds unresponsive. No window resize hook is installed by
+default. Loading =org-mandala.el= also removes any stale resize hook left
+by older development versions.
+
+When the mandala view window becomes extremely small, =org-mandala= does
+not attempt SVG rendering and shows a short resize message instead. This
+prevents heavy redisplay loops on tiny windows; enlarge the window and
+press =g= to render again.
+
+* Known Limits
+
+This MVP does not edit text directly inside the SVG. Mouse selection is
+not guaranteed. The view buffer is not saved as a file; only the Org
+source file is persistent.
+
+* Tests
+
+Run the ERT suite from the repository root:
+
+#+begin_src sh
+emacs -Q --batch -L . \
+  -l ert \
+  -l org-mandala.el \
+  -l org-mandala-tests.el \
+  -f ert-run-tests-batch-and-exit
+#+end_src

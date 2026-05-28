@@ -1,0 +1,73 @@
+#+TITLE: Mandala Memo Example
+#+MANDALA: t
+
+* Epilogue
+:PROPERTIES:
+:ID: epilogue
+:END:
+
+** マンダラは人間の基本機能
+:PROPERTIES:
+:ID: basic-function
+:MANDALA_POS: s
+:END:
+
+一度に8つまで考えることができる。
+目的を持ってその達成を図ることができる。
+
+*** 一度に8つまで考えることができる
+:PROPERTIES:
+:MANDALA_POS: nw
+:END:
+
+*** 8つの欲望を持つことができる
+:PROPERTIES:
+:MANDALA_POS: n
+:END:
+
+*** 取捨選択をすることができる
+:PROPERTIES:
+:MANDALA_POS: ne
+:END:
+
+*** 前後左右斜めと四方八方に動ける
+:PROPERTIES:
+:MANDALA_POS: w
+:END:
+
+*** 目的を持ってその達成を図ることができる
+:PROPERTIES:
+:MANDALA_POS: e
+:END:
+
+達成条件が作れる。
+
+*** あっちゃこっちゃ四方八方を見ることができる
+:PROPERTIES:
+:MANDALA_POS: sw
+:END:
+
+*** 人間はいろいろな面を持っている
+:PROPERTIES:
+:MANDALA_POS: s
+:END:
+
+*** 階層レベルを上下して考えることができる
+:PROPERTIES:
+:MANDALA_POS: se
+:END:
+
+** 手法を身につける！
+:PROPERTIES:
+:MANDALA_POS: w
+:END:
+
+** 環境をつくる！
+:PROPERTIES:
+:MANDALA_POS: n
+:END:
+
+** 階層思考をマスターする！
+:PROPERTIES:
+:MANDALA_POS: e
+:END:
