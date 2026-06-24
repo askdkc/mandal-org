@@ -6,6 +6,8 @@ The data remains ordinary Org headings in one =.org= file. The mandala
 buffer is a read-only SVG view for selecting cells and moving through the
 hierarchy; editing happens in the normal full Org buffer.
 
+[[file:/images/mandala-screen.jpg]]
+
 * Install
 
 ** use-package with =:vc= (Emacs 30+)
