@@ -1,0 +1,24 @@
+/* XPM */
+static char *org_mandala_cell_center_xpm[] = {
+"24 16 4 1",
+"B c #5A6F8F",
+"c c #DCE8F4",
+"d c #C8D8EA",
+"g c #94A9C2",
+"BBBBBBBBBBBBBBBBBBBBBBBB",
+"BccccccccccccccccccccccB",
+"BccccccccccccccccccccccB",
+"BccccccccccccccccccccccB",
+"BccccccccccccccccccccccB",
+"BccccccccccccccccccccccB",
+"BccccccccccccccccccccccB",
+"BccccccccccccccccccccccB",
+"BccccccccccccccccccccccB",
+"BccccccccccccccccccccccB",
+"BccccccccccccccccccccccB",
+"BccccccccccccccccccccccB",
+"BccccccccccccccccccccccB",
+"BddddddddddddddddddddddB",
+"BggggggggggggggggggggggB",
+"BBBBBBBBBBBBBBBBBBBBBBBB"
+};

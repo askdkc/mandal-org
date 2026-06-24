@@ -1,51 +1,90 @@
-#+TITLE: org-mandala.el
+#+TITLE: mandal-org.el
+* Mandala Memo for Emacs
 
-=org-mandala.el= shows one Org file as a hierarchical 3x3 mandala memo.
+=mandal-org.el= shows one Org file as a hierarchical 3x3 mandala memo.
 The data remains ordinary Org headings in one =.org= file. The mandala
 buffer is a read-only SVG view for selecting cells and moving through the
 hierarchy; editing happens in the normal full Org buffer.
 
 * Install
 
-Put this repository on =load-path= and load the package:
+** use-package with =:vc= (Emacs 30+)
 
 #+begin_src elisp
-(add-to-list 'load-path "/path/to/mandal-org")
-(require 'org-mandala)
+(use-package mandal-org
+  :vc (:url "https://github.com/askdkc/mandal-org" :rev :newest)
+  :bind (("C-c m n" . mandal-org-open-or-create))
+  :config
+  (setopt mandal-org-directory "~/notes/mandala/"))
 #+end_src
 
-=mandal-org.el= is also provided as a small compatibility loader.
-=mandalorg.el= remains as a backward-compatibility shim.
+** use-package with a manual clone
 
-The Org buffer command is bound after Org loads:
+#+begin_src sh
+git clone https://github.com/askdkc/mandal-org ~/.emacs.d/site-lisp/mandal-org
+#+end_src
 
 #+begin_src elisp
-C-c C-v m  org-mandala-view
+(use-package mandal-org
+  :load-path "~/.emacs.d/site-lisp/mandal-org"
+  :bind (("C-c m n" . mandal-org-open-or-create))
+  :config
+  ;; Where new mandala files are created and searched.
+  (setopt mandal-org-directory "~/notes/mandala/")
+  ;; Optional: auto-refit the SVG after a window resize settles (off by default).
+  (setopt mandal-org-auto-refresh-on-window-size-change t)
+  ;; Optional: cell edit popup height (fraction of the frame, or a line count).
+  (setopt mandal-org-edit-popup-height 0.4))
 #+end_src
+
+** Plain =require=
+
+#+begin_src elisp
+(add-to-list 'load-path "~/.emacs.d/site-lisp/mandal-org")
+(require 'mandal-org)
+#+end_src
+
+Loading the package binds =C-c m n= globally to
+=mandal-org-open-or-create=, and =C-c C-v m= in Org buffers to
+=mandal-org-view=.
 
 * Quick Start
 
-Run:
+The quickest entry point is:
 
 #+begin_src elisp
-M-x org-mandala-new
+C-c m n     mandal-org-open-or-create
 #+end_src
 
-Or open the bundled tutorial sample directly:
+This prompts with completion over the mandala files already in
+=mandal-org-directory=:
+
+- Pick an existing file to open it as a mandala.
+- Type a *new* central keyword to create a brand new mandala. The file is
+  written into =mandal-org-directory= with a Denote-like name, e.g.
+  =20240115T143022--central-keyword.org=.
+
+Set the storage directory with =:config= / Customize:
 
 #+begin_src elisp
-M-x org-mandala-tutorial
+(setopt mandal-org-directory "~/notes/mandala/")
 #+end_src
 
-Choose a new =.org= file and enter the central theme. The package writes
-only the minimal Org data: title metadata plus one top-level heading with
-an =ID=. The eight empty surrounding cells are not created until you edit
-one of them.
+You can also create a file at an explicit path with =M-x mandal-org-new=,
+or open the bundled tutorial sample directly:
+
+#+begin_src elisp
+M-x mandal-org-tutorial
+#+end_src
+
+A new file holds only the minimal Org data: title metadata plus one
+top-level heading with an =ID=. The eight empty surrounding cells are not
+created until you edit one of them.
 
 To open an existing Org mandala file, visit the file in =org-mode= and run:
 
 #+begin_src elisp
-M-x org-mandala-view
+M-x mandal-org-view
 #+end_src
 
 If point is before the first heading, the first heading is used as the
@@ -65,15 +104,82 @@ from an edit session started in the mandala view.
 | =b=        | select southwest cell                           |
 | =n=        | select southeast cell                           |
 | =c=, =.=   | move selection back to the center cell          |
-| =e=        | edit selected cell in the normal Org buffer     |
-| =RET=      | enter selected existing cell as the next center |
-| =DEL=, =^= | go to the parent mandala                        |
+| =C-n=        | select next cell, clockwise from center (wraps)  |
+| =M-n=, =C-p=  | select previous cell, counterclockwise (wraps)   |
+| =e=          | edit selected cell in a popup (create if empty)  |
+| =RET=, =C-d=  | enter selected existing cell as the next center  |
+| =DEL=, =^=, =C-u= | go to the parent mandala                     |
 | =g=        | redraw from the current Org buffer contents     |
 | =q=        | quit the view and return to the Org buffer      |
 
-After editing, save with normal Org/Emacs commands such as =C-x C-s=.
-Run =M-x org-mandala-view= or =C-c C-v m= in the Org buffer to return to
-the same mandala level that was visible before editing.
+* Navigation
+
+The view always shows one 3x3 grid. The middle cell is the current
+*center*; the eight cells around it are the center's direct child
+headings:
+
+#+begin_example
+nw | n  | ne
+---+----+---
+w  | C  | e
+---+----+---
+sw | s  | se
+#+end_example
+
+** Selecting a cell
+
+Selecting only moves the highlight; it does not change the center. There
+are three ways to move the selection:
+
+- Directional keys map to compass positions:
+  =h= west, =l= east, =k= north, =j= south, and the diagonals =y= nw,
+  =u= ne, =b= sw, =n= se.
+- =C-n= steps clockwise and =M-n= (or =C-p=) steps counterclockwise
+  through every cell. From the center the clockwise order is
+  =C s sw w nw n ne e se= back to =C=, wrapping at the ends.
+- =c= or =.= jumps the selection back to the center.
+
+** Expanding a cell as the new center
+
+Select a cell that already exists, then press =RET= (or =C-d=). That child
+becomes the new center and *its* eight children fill the surrounding
+cells. This is the recursive Mandal-Art expansion: every cell can become
+the middle of its own 3x3 grid. Pressing =RET= on an empty cell does
+nothing (create it with =e= first).
+
+** Going back up
+
+Press =DEL=, =^=, or =C-u= to move to the *parent* mandala, i.e. make the
+current center's parent heading the center again. Repeat to climb back toward the
+top-level theme. At the top there is no parent, so it reports "Already at
+the top mandala".
+
+** Editing and creating cells
+
+Press =e= on the selected cell to edit it (see below). On an empty
+surrounding cell, =e= first creates the child heading at that position,
+then opens it. After saving, the view refreshes in place.
+
+** Leaving the view
+
+=g= redraws from the current Org contents (use it after resizing the
+window or after external edits). =q= closes the view and returns to the
+source Org buffer.
+
+Pressing =e= opens a popup window at the bottom of the frame showing
+that cell's heading and its direct body as ordinary Org text (it is an
+indirect buffer narrowed onto the source file, so you are editing the
+real data). Take notes in Org format, then:
+
+| Key       | Action                                            |
+|-----------+---------------------------------------------------|
+| =C-c C-c= | save the file, close the popup, refresh the view  |
+| =C-c C-k= | close the popup without writing the file          |
+
+The save shortcut is also shown in the popup's header line. Selecting an
+empty cell and pressing =e= first creates the child heading (with =ID=
+and =MANDALA_POS=) and then opens it for editing. The popup height is
+controlled by =mandal-org-edit-popup-height=.
 
 * Data Model
 
@@ -113,34 +219,44 @@ count are controlled by:
 
 In the SVG view, heading titles are rendered with a heavier weight and
 body preview lines are rendered slightly smaller. If body text was
-accidentally inserted before the property drawer, =org-mandala= still
+accidentally inserted before the property drawer, =mandal-org= still
 detects the cell's =MANDALA_POS= so reopening the same cell does not
 create another node at the same position. Duplicate positions that already
 exist under the same parent must still be fixed in the Org file.
 
 #+begin_src elisp
-org-mandala-cell-preview-lines
-org-mandala-cell-preview-width
-org-mandala-svg-width
-org-mandala-svg-height
-org-mandala-fit-window
-org-mandala-auto-refresh-on-window-size-change
-org-mandala-window-size-change-delay
+mandal-org-cell-preview-lines
+mandal-org-cell-preview-width
+mandal-org-svg-width
+mandal-org-svg-height
+mandal-org-fit-window
+mandal-org-auto-refresh-on-window-size-change
+mandal-org-window-size-change-delay
 #+end_src
 
-By default the SVG uses the fixed =org-mandala-svg-width= and
-=org-mandala-svg-height= values. The default fixed size is intentionally
+By default the SVG uses the fixed =mandal-org-svg-width= and
+=mandal-org-svg-height= values. The default fixed size is intentionally
 modest to avoid expensive SVG redisplay during frame resizing. Set
-=org-mandala-fit-window= to non-nil to fit the SVG to the visible Emacs
+=mandal-org-fit-window= to non-nil to fit the SVG to the visible Emacs
 window when the view is drawn, then press =g= in the mandala view to
-redraw manually after resizing. Automatic redraw after window size
-changes is disabled, even if =org-mandala-auto-refresh-on-window-size-change=
-is set, because repeated SVG rasterization during frame resizing can make
-some Emacs builds unresponsive. No window resize hook is installed by
-default. Loading =org-mandala.el= also removes any stale resize hook left
-by older development versions.
+redraw manually after resizing.
 
-When the mandala view window becomes extremely small, =org-mandala= does
+By default no window resize hook is installed, so resizing the frame
+never triggers a redraw; press =g= when you are done. If you want the
+view to refit itself automatically, opt in with:
+
+#+begin_src elisp
+(setopt mandal-org-auto-refresh-on-window-size-change t)
+#+end_src
+
+This is safe for live resizing: nothing is rendered while you drag a
+frame edge. A single redraw runs only after resizing has been idle for
+=mandal-org-window-size-change-delay= seconds (default 0.18), so the
+expensive SVG rasterization never happens mid-drag and cannot make Emacs
+unresponsive. Use =setopt= or Customize (not =setq=) so the resize hook
+is installed or removed automatically.
+
+When the mandala view window becomes extremely small, =mandal-org= does
 not attempt SVG rendering and shows a short resize message instead. This
 prevents heavy redisplay loops on tiny windows; enlarge the window and
 press =g= to render again.
@@ -149,7 +265,10 @@ press =g= to render again.
 
 This MVP does not edit text directly inside the SVG. Mouse selection is
 not guaranteed. The view buffer is not saved as a file; only the Org
-source file is persistent.
+source file is persistent. Only direct children of the current center are
+shown; grandchildren appear only after entering a cell. Duplicate or
+invalid =MANDALA_POS= values under one parent are rejected with a
+=user-error= and must be fixed in the Org file.
 
 * Tests
 
@@ -158,7 +277,7 @@ Run the ERT suite from the repository root:
 #+begin_src sh
 emacs -Q --batch -L . \
   -l ert \
-  -l org-mandala.el \
-  -l org-mandala-tests.el \
+  -l mandal-org.el \
+  -l mandal-org-tests.el \
   -f ert-run-tests-batch-and-exit
 #+end_src

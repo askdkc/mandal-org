@@ -1,0 +1,18 @@
+#+TITLE: org-mandala XPM image assets
+
+This directory contains small XPM cell tiles for an image-based renderer
+modeled after Emacs GNU Go's XPM tile approach.
+
+Each file is a standalone XPM image that can be loaded with
+=create-image= or =insert-image=.  The current package still renders the
+mandala as text; these files are only the image assets needed for an XPM
+implementation.
+
+| File | Intended state |
+|------|----------------|
+| =org-mandala-cell.xpm= | normal filled cell |
+| =org-mandala-cell-center.xpm= | current center cell |
+| =org-mandala-cell-selected.xpm= | selected non-center cell |
+| =org-mandala-cell-selected-center.xpm= | selected center cell |
+| =org-mandala-cell-empty.xpm= | creatable empty surrounding cell |
+| =org-mandala-cell-empty-selected.xpm= | selected creatable empty cell |

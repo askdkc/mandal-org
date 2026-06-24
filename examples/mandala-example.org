@@ -1,7 +1,9 @@
 #+TITLE: Mandala Memo Example
 #+MANDALA: t
 
-* Epilogue
+* Mandal-Org
+e で 編集
+C-n で マンダラを巡る
 :PROPERTIES:
 :ID: epilogue
 :END:
@@ -71,3 +73,40 @@
 :PROPERTIES:
 :MANDALA_POS: e
 :END:
+
+** Practice daily
+:PROPERTIES:
+:ID: practice-daily
+:MANDALA_POS: nw
+:END:
+
+Fill in one cell at a time.
+毎日少しずつ埋めていく。
+
+#+begin_src elisp
+(org-mandala-view)
+#+end_src
+
+** Review weekly
+:PROPERTIES:
+:ID: review-weekly
+:MANDALA_POS: ne
+:END:
+
+Look back and adjust the goals.
+
+** Share with others
+:PROPERTIES:
+:ID: share-others
+:MANDALA_POS: sw
+:END:
+
+仲間と共有して視点を増やす。
+
+** Celebrate progress
+:PROPERTIES:
+:ID: celebrate-progress
+:MANDALA_POS: se
+:END:
+
+Reward small wins.

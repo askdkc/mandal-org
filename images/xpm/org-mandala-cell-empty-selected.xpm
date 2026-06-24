@@ -1,0 +1,25 @@
+/* XPM */
+static char *org_mandala_cell_empty_selected_xpm[] = {
+"24 16 5 1",
+"S c #B66A14",
+". c #FFF8E8",
+"d c #E5D7BF",
+"p c #B66A14",
+"x c #D79B45",
+"SSSSSSSSSSSSSSSSSSSSSSSS",
+"S......................S",
+"S.d.d.d.d.d.d.d.d.d.d..S",
+"S......................S",
+"S......................S",
+"S..........pp..........S",
+"S..........pp..........S",
+"S........pppppp........S",
+"S........pppppp........S",
+"S..........pp..........S",
+"S..........pp..........S",
+"S......................S",
+"S......................S",
+"S.d.d.d.d.d.d.d.d.d.d..S",
+"SxxxxxxxxxxxxxxxxxxxxxxS",
+"SSSSSSSSSSSSSSSSSSSSSSSS"
+};
